@@ -33,7 +33,7 @@ func GetBoard(w http.ResponseWriter, r *http.Request) {}
 func PostBoard(w http.ResponseWriter, r *http.Request) {
 	var post core.Post
 	if json.NewDecoder(r.Body).Decode(&post) != nil {
-		http.Error(w, "hijueputa enviaste una monda rara", http.StatusBadRequest)
+		http.Error(w, "the fuck is this", http.StatusBadRequest)
 		return
 	}
 	post.Date = int(time.Now().Unix())

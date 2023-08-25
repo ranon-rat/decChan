@@ -10,6 +10,7 @@ const (
 	ErrMsg  = "[-]"
 	InfoMsg = "[?]"
 	TodoMsg = "[+]"
+	Limit   = 50
 )
 
 func PrintErr(msg ...any) {

@@ -36,7 +36,7 @@ func Receiver(c *websocket.Conn) {
 			return
 		}
 		if len(block.BlocksDeletion) == 0 && len(block.BlocksPosts) == 0 {
-			core.PrintErr("enviaron mierda vacia")
+			core.PrintErr("empty block")
 			delete(conns, c)
 			return
 
@@ -54,6 +54,7 @@ func Receiver(c *websocket.Conn) {
 			case 1:
 				continue
 			case 2:
+				core.PrintInfo("someone sent a non valid block")
 				delete(conns, c)
 				return
 			}

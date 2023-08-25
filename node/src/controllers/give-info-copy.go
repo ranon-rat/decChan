@@ -13,12 +13,12 @@ func GiveInfo(w http.ResponseWriter, r *http.Request) {
 
 	dateString := r.URL.Query().Get("date")
 	if dateString == "" {
-		http.Error(w, "jodete esto no es", http.StatusBadRequest)
+		http.Error(w, "this is empty", http.StatusBadRequest)
 		return
 	}
 	date, err := strconv.Atoi(dateString)
 	if err != nil {
-		http.Error(w, "jodete maldito maricon me enviaste algo que no es un numero", http.StatusBadRequest)
+		http.Error(w, "this isnt a number", http.StatusBadRequest)
 		return
 	}
 

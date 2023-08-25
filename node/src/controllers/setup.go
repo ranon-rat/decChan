@@ -33,7 +33,7 @@ func setupConns() {
 	}
 	var connsIPs []core.ConnIP
 	json.NewDecoder(r.Body).Decode(&connsIPs)
-	Choose(connsIPs)
+	Choose(connsIPs) // I update my db
 
 	for _, c := range connsIPs {
 		conn, err := ConnectWS(c.IP + ":" + strconv.Itoa(c.Port))

@@ -1,25 +1,7 @@
 package db
 
 /*
-CREATE TABLE POSTS(
-
-		Date INT,
-		Body TEXT(1500),
-		Username VARCHAR(64),
-	    Title VARCHAR(64),
-		hash varchar(64),
-	    subBoard VARCHAR(64),-- it could be a response to a post, so this is something that i need to keep in mind
-	    Signature VARCHAR(512)
-
-);
-CREATE TABLE Deletion(
-
-	DatePost INT,
-	DatDeletion INT,
-	HashPost VARCHAR(64),
-	SignatureVARCHAR(512),
-
-);
+REMINDER TO END THIS AT HOME
 */
 func GetLastPostDate() (date int) {
 

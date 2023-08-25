@@ -30,7 +30,6 @@ func Choose(conns []core.ConnIP) {
 
 		var blocks core.Blocks
 		json.NewDecoder(r.Body).Decode(&blocks)
-		// luego arreglo esto
 		for _, bp := range blocks.BlocksPosts {
 			signature := hexToB(bp.Signature)
 			hash := crypt.GenHashPost(bp.Post)

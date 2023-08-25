@@ -15,6 +15,10 @@ func Connect(w http.ResponseWriter, r *http.Request) {
 
 	ip := r.Header.Get("X-Forwarded-For") // id ont know
 	portS := r.URL.Query().Get("port")
+	if ip == "" || portS == "" {
+		http.Error(w, "empty fields fuck you", http.StatusBadRequest)
+
+	}
 	port, err := strconv.Atoi(portS)
 	if err != nil {
 		http.Error(w, "fuck you you sent soemthing weird in the port field", http.StatusBadRequest)
@@ -25,10 +29,9 @@ func Connect(w http.ResponseWriter, r *http.Request) {
 	listConns[conn] = true
 
 	for {
-		// i will change this later so i can avoid using an external tool but i dont have internet right now
-		// so i cant install a tool for using it
-		// maybe i should do something for checking if the this is operational and its not jus a trolling node
-		// sometimes it can happened but i think that the nodes will be able to handle this
+		// I will change this later
+		// for now i dont think that this is a problem
+
 		out, _ := exec.Command("ping", ip, "-c 1").Output()
 		if strings.Contains(string(out), "100% packet loss") {
 			delete(listConns, conn)

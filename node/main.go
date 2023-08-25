@@ -12,6 +12,6 @@ var port = 8000 + rand.Intn(100)
 
 func main() {
 	router.Setup(strconv.Itoa(port))
-	fmt.Println("not ready, fuck you ")
+	fmt.Println("this isnt ready i need to finish the server, wait a few days for ending this")
 
 }
