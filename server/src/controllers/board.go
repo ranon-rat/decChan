@@ -51,25 +51,77 @@ func GetBoard(w http.ResponseWriter, r *http.Request) {
 	reason := ""
 	status := 404
 	conn := GetRandomConns()
+	var blocksC [][]core.BlockPost
 	for _, ipConn := range conn {
+		var blocks []core.BlockPost
 		r, err := http.Get(fmt.Sprintf("http://%s:%d/get-post?date=%d&board=%s", ipConn.IP, ipConn.Port, date, board))
 		if err != nil {
 			if strings.Contains(err.Error(), "connection refused") {
 				delete(listConns, ipConn)
+				continue
 			}
 			manyErrors++
 			status = r.StatusCode
 			reason = err.Error()
 		}
+		json.NewDecoder(r.Body).Decode(&blocks)
+
+		if !CheckValid(blocks) {
+			delete(listConns, ipConn)
+			continue
+		}
+
+		blocksC = append(blocksC, blocks)
+
 	}
 	if manyErrors > len(conn)/2 {
 		http.Error(w, reason, status)
+		return
 	}
+	json.NewEncoder(w).Encode(GetMostPopular(blocksC))
+}
+func CheckValid(blocks []core.BlockPost) bool {
+	for _, v := range blocks {
+		signature, _ := hex.DecodeString(v.Signature)
+		hash := crypt.GenHashPost(v.Post)
+		if !crypt.VerifySignature(signature, hash, PublicKey) {
+			return false
+		}
+	}
+	return true
+}
+func GetMostPopular(blocksC [][]core.BlockPost) (final []core.BlockPost) {
+
+	arrayMap := make(map[string]int)
+	for _, array := range blocksC {
+
+		b, _ := json.Marshal(array)
+		s := string(b)
+		arrayMap[s]++
+
+	}
+	s := ""
+	for k, v := range arrayMap {
+		if s == "" {
+			s = k
+		}
+
+		if arrayMap[s] < v {
+			s = k
+		}
+	}
+	json.Unmarshal([]byte(s), &final)
+	return
 }
 
 // REMINDER: Add a captcha when everything is ready
+// also, i ahve to change the way i do this
+// i need to use a form request for making the site usable for everyone
+// even the ones that doesnt use javascript
+
 func PostBoard(w http.ResponseWriter, r *http.Request) {
 	var post core.Post
+
 	if json.NewDecoder(r.Body).Decode(&post) != nil {
 		http.Error(w, "the fuck is this", http.StatusBadRequest)
 		return
@@ -96,6 +148,7 @@ func PostBoard(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			if strings.Contains(err.Error(), "connection refused") {
 				delete(listConns, ipConn)
+				continue
 			}
 			status = r.StatusCode
 			reason = err.Error()
@@ -104,6 +157,7 @@ func PostBoard(w http.ResponseWriter, r *http.Request) {
 	}
 	if manyErrors > len(conns)/2 {
 		http.Error(w, reason, status)
+		return
 	}
 }
 

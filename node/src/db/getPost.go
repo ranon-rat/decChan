@@ -6,7 +6,7 @@ import (
 	"github.com/ranon-rat/decChan/core"
 )
 
-func GetPosts(name string, date int) (blocks core.Blocks) {
+func GetPosts(name string, date int) (blocks []core.BlockPost) {
 	db := ConnectDB()
 	var r *sql.Rows
 	if core.Boards[name] {
@@ -17,13 +17,7 @@ func GetPosts(name string, date int) (blocks core.Blocks) {
 		r, _ = db.Query("SELECT * FROM Posts WHERE board=?1 OR hash=?1 ORDER BY date DESC ", name)
 
 	}
-	blocks.BlocksPosts = ScanningPost(r)
+	blocks = ScanningPost(r)
 
 	return
-}
-func ItGotToLimit(hash string) bool {
-	db := ConnectDB()
-	howMany := 0
-	db.QueryRow("SELECT COUNT(*) WHERE board=?1", hash).Scan(&howMany)
-	return howMany < core.LimitPerThread
 }
