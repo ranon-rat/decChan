@@ -32,9 +32,16 @@ func VerifySignature(signature, msgHash []byte, pubKey *rsa.PublicKey) bool {
 	return rsa.VerifyPSS(pubKey, crypto.SHA256, msgHash, signature, nil) == nil
 }
 func GenHashPost(post core.Post) []byte {
-	return sha256.New().Sum([]byte(post.User + post.Post + post.Title + strconv.Itoa(post.Date)))
+	return sha256.New().
+		Sum([]byte(post.User +
+			post.Post +
+			post.Title +
+			strconv.Itoa(post.Date)))
 }
 func GenHashDelete(blockDeletion core.BlockDeletion) []byte {
-	return sha256.New().Sum([]byte("DELETE" + blockDeletion.HashPost + strconv.Itoa(blockDeletion.DateDeletion) + strconv.Itoa(blockDeletion.DatePost)))
+	return sha256.New().Sum([]byte("DELETE" +
+		blockDeletion.HashPost +
+		strconv.Itoa(blockDeletion.DateDeletion) +
+		strconv.Itoa(blockDeletion.DatePost)))
 
 }

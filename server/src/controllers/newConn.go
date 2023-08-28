@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -23,15 +22,12 @@ func Connect(w http.ResponseWriter, r *http.Request) {
 	if strings.Contains(ip, ":") {
 		ip = strings.Split(ip, ":")[0]
 	}
-	fmt.Println(ip)
 	portS := r.URL.Query().Get("port")
 
-	fmt.Println(portS, ip, r.URL.Query())
 	if portS == "" {
 		http.Error(w, "empty field fuck you", http.StatusBadRequest)
 		return
 	}
-	fmt.Println(portS)
 	port, err := strconv.Atoi(portS)
 	if err != nil {
 		http.Error(w, "fuck you you sent soemthing weird in the port field", http.StatusBadRequest)
@@ -40,6 +36,5 @@ func Connect(w http.ResponseWriter, r *http.Request) {
 	conn := core.ConnIP{IP: ip, Port: port}
 
 	listConns[conn] = true
-	fmt.Println(listConns)
 
 }

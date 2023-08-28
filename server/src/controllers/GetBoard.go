@@ -30,7 +30,6 @@ func GetBoard(w http.ResponseWriter, r *http.Request) {
 	if _, err := hex.DecodeString(board); !core.Boards[board] && err != nil {
 		http.Error(w, "non valid field, something is wrong", http.StatusBadRequest)
 	}
-	fmt.Println(date)
 	manyErrors := 0
 	reason := ""
 	status := 404

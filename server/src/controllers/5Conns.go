@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"encoding/json"
-	"fmt"
 	"math/rand"
 	"net/http"
 	"reflect"
@@ -25,7 +24,6 @@ func GetRandomConns() []core.ConnIP {
 	for v := range rand5 {
 		rando = append(rando, v)
 	}
-	fmt.Println(rando)
 	return rando
 }
 func Conns5(w http.ResponseWriter, r *http.Request) {

@@ -7,6 +7,8 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"net/http"
+
+	"github.com/ranon-rat/decChan/core"
 )
 
 // this is for the controllers
@@ -26,10 +28,13 @@ also, the size of the signature is 512 if we are using hex for coding it, and th
 so i need to keep that in mind while working in the database.
 */
 
-func SignMSG(priKey *rsa.PrivateKey, msgHashSum []byte) (signature []byte) {
+func SignMSG(priKey *rsa.PrivateKey, msgHashSum []byte) []byte {
 
 	// i dont think that there is no need to save the hash, but i will save it in the server
-	signature, _ = rsa.SignPSS(rand.Reader, priKey, crypto.SHA256, msgHashSum, nil)
-	return
+	signature, err := rsa.SignPSS(rand.Reader, priKey, crypto.SHA256, msgHashSum, nil)
+	if err != nil {
+		core.PrintErr(err)
+	}
+	return signature
 
 }
