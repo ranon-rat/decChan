@@ -39,8 +39,10 @@ func GenPostStr(post core.Post) []byte {
 
 }
 func GenHashPost(post core.Post) []byte {
-	return sha256.New().
-		Sum(GenPostStr(post))
+	msgHash := sha256.New()
+	msgHash.Sum(GenPostStr(post))
+
+	return msgHash.Sum(nil)
 }
 func GenHashDelete(blockDeletion core.BlockDeletion) []byte {
 	return sha256.New().Sum([]byte("DELETE" +
