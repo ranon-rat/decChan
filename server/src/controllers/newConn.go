@@ -3,10 +3,8 @@ package controllers
 import (
 	"fmt"
 	"net/http"
-	"os/exec"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/ranon-rat/decChan/core"
 )
@@ -14,12 +12,26 @@ import (
 func Connect(w http.ResponseWriter, r *http.Request) {
 	/// CHANGE THIS LATER, JUST USE HIS IP
 
-	ip := r.Header.Get("X-Forwarded-For") // id ont know
-	portS := r.URL.Query().Get("port")
-	if ip == "" || portS == "" {
-		http.Error(w, "empty fields fuck you", http.StatusBadRequest)
-
+	ip := r.Header.Get("X-FORWARDED-FOR")
+	if ip == "" {
+		ip = r.RemoteAddr
 	}
+
+	if strings.Contains(ip, "[::1]") {
+		ip = "127.0.0.1"
+	}
+	if strings.Contains(ip, ":") {
+		ip = strings.Split(ip, ":")[0]
+	}
+	fmt.Println(ip)
+	portS := r.URL.Query().Get("port")
+
+	fmt.Println(portS, ip, r.URL.Query())
+	if portS == "" {
+		http.Error(w, "empty field fuck you", http.StatusBadRequest)
+		return
+	}
+	fmt.Println(portS)
 	port, err := strconv.Atoi(portS)
 	if err != nil {
 		http.Error(w, "fuck you you sent soemthing weird in the port field", http.StatusBadRequest)
@@ -30,15 +42,4 @@ func Connect(w http.ResponseWriter, r *http.Request) {
 	listConns[conn] = true
 	fmt.Println(listConns)
 
-	for {
-		// I will change this later
-		// for now i dont think that this is a problem
-
-		out, _ := exec.Command("ping", ip, "-c 1").Output()
-		if strings.Contains(string(out), "100% packet loss") {
-			delete(listConns, conn)
-			return
-		}
-		time.Sleep(time.Minute)
-	}
 }

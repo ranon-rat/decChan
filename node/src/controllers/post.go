@@ -43,12 +43,16 @@ func NewPost(w http.ResponseWriter, r *http.Request) {
 	post := blockPost.Post
 	hash := crypt.GenHashPost(post)
 	signature, err := hex.DecodeString(blockPost.Signature)
+
 	if err != nil {
+		fmt.Println(err)
 		return
 	}
+	fmt.Println(blockPost)
 	// verify everything
 	if !crypt.VerifySignature(signature, hash, pubKey) {
 		core.PrintInfo("someone sent something weird")
+		http.Error(w, "non valid block", 404)
 		return
 	}
 	fmt.Println(post.Board)

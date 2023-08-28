@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -61,8 +62,10 @@ func setupKey() {
 }
 
 func Setup(port string) {
-	_, err := http.Get("http://" + core.MainServer + "/connect&port=" + (port))
+	str := "http://" + core.MainServer + "/connect?port=" + port
+	_, err := http.Get(str)
 	if err != nil {
+		fmt.Println(err)
 		panic(err)
 	}
 	setupKey()

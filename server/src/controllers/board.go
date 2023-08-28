@@ -51,7 +51,7 @@ func PostBoard(w http.ResponseWriter, r *http.Request) {
 	hash := crypt.GenHashPost(post)
 	signature := crypt.SignMSG(PrivateKey, hash)
 	sentIt := bytes.NewBuffer(nil)
-
+	fmt.Println(post)
 	json.NewEncoder(sentIt).Encode(core.BlockPost{Signature: hex.EncodeToString(signature), Post: post})
 	manyErrors := 0
 	status := 404

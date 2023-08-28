@@ -45,7 +45,6 @@ func GetBoard(w http.ResponseWriter, r *http.Request) {
 				continue
 			}
 			manyErrors++
-			status = r.StatusCode
 			reason = err.Error()
 		}
 		json.NewDecoder(r.Body).Decode(&blocks)

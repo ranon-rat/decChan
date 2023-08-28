@@ -1,6 +1,7 @@
 package router
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/ranon-rat/decChan/node/src/controllers"
@@ -17,6 +18,6 @@ func Setup(port string) {
 	http.HandleFunc("/new-post", controllers.NewPost)
 	http.HandleFunc("/del-post", controllers.DeletePost)
 
-	http.ListenAndServe(":"+port, nil)
+	log.Println(http.ListenAndServe(":"+port, nil))
 
 }

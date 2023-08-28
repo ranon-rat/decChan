@@ -26,6 +26,7 @@ func Choose(conns []core.ConnIP) {
 		r, err := http.Get(fmt.Sprintf("http://%s:%d/give-info-copy?date=%d", conn.IP, conn.Port, lastDate))
 		if err != nil {
 			core.PrintErr("this conn has failed", conn.IP)
+			continue
 		}
 
 		var blocks core.Blocks
