@@ -10,22 +10,6 @@ import (
 	"golang.org/x/net/websocket"
 )
 
-/*
-0: todo bien
-1: algo repetido, continua
-2: bloque no valido, mata conexion
-*/
-func AddSomething(hashBlock, signature []byte, hashPost string) int { // 0= to bien 1=algo repetido 2=to mal
-	if !crypt.VerifySignature(signature, hashBlock, pubKey) {
-		return 2
-	}
-
-	if db.CheckExistencePosts(hashPost) || db.CheckExistenceDeletion(hashPost) {
-		return 1
-	}
-	return 0
-}
-
 // this may be used in the future i need to work on it
 func Receiver(c *websocket.Conn) {
 	conns[c] = true
@@ -46,18 +30,16 @@ func Receiver(c *websocket.Conn) {
 			hashBlock := crypt.GenHashPost(blockPost.Post)
 			hashPost := hex.EncodeToString(hashBlock)
 			signature := hexToB(blockPost.Signature)
-
-			switch AddSomething(hashBlock, signature, hashPost) {
-			case 0:
-				db.AddPost(blockPost)
-				blocksChan <- BlockSender{Sender: c, Blocks: block}
-			case 1:
-				continue
-			case 2:
+			if !crypt.VerifySignature(signature, hashBlock, pubKey) {
 				core.PrintInfo("someone sent a non valid block")
 				delete(conns, c)
-				return
+
 			}
+			if db.CheckExistencePosts(hashPost) || db.CheckExistenceDeletion(hashPost) {
+				continue
+			}
+			db.AddPost(blockPost)
+			blocksChan <- BlockSender{Sender: c, Blocks: block}
 
 		}
 		if len(block.BlocksPosts) == 0 && len(block.BlocksDeletion) == 1 {
@@ -65,17 +47,16 @@ func Receiver(c *websocket.Conn) {
 			hashBlock := crypt.GenHashDelete(blockDeletion)
 			hashPost := blockDeletion.HashPost
 			signature := hexToB(blockDeletion.Signature)
-			switch AddSomething(hashBlock, signature, hashPost) {
-			case 0:
-				db.DeletePost(blockDeletion)
-				blocksChan <- BlockSender{Sender: c, Blocks: block}
-			case 1:
-				continue
-			case 2:
+			if !crypt.VerifySignature(signature, hashBlock, pubKey) {
+				core.PrintInfo("someone sent a non valid block")
 				delete(conns, c)
-				return
 
 			}
+			if db.CheckExistenceDeletion(hashPost) {
+				continue
+			}
+			db.DeletePost(blockDeletion)
+			blocksChan <- BlockSender{Sender: c, Blocks: block}
 		}
 	}
 }

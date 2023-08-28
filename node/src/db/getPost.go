@@ -1,19 +1,29 @@
 package db
 
 import (
-	"fmt"
+	"database/sql"
 
 	"github.com/ranon-rat/decChan/core"
 )
 
-func GetPostsBoard(name string, date int) (blocks core.Blocks) {
+func GetPosts(name string, date int) (blocks core.Blocks) {
 	db := ConnectDB()
-	r, _ := db.Query("SELECT * FROM Posts WHERE board=?1 and date>=?2 LIMIT ?3", name, date, core.Limit)
-	for r.Next() {
+	var r *sql.Rows
+	if core.Boards[name] {
+		r, _ = db.Query("SELECT * FROM Posts WHERE board=?1 and date<=?2 LIMIT ?3 ORDER BY date ASC", name, date, core.LimitPerBoard)
 
-		r.Scan()
-		fmt.Println("fuck")
+	} else {
+		// I use the board as a way of saying "hey this could be a board or a thread and if is a thread just get all this stuff and just that"
+		r, _ = db.Query("SELECT * FROM Posts WHERE board=?1 OR hash=?1 ORDER BY date DESC ", name)
+
 	}
+	blocks.BlocksPosts = ScanningPost(r)
+
 	return
 }
-func GetPostThread(hash string) {}
+func ItGotToLimit(hash string) bool {
+	db := ConnectDB()
+	howMany := 0
+	db.QueryRow("SELECT COUNT(*) WHERE board=?1", hash).Scan(&howMany)
+	return howMany < core.LimitPerThread
+}

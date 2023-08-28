@@ -4,12 +4,34 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/ranon-rat/decChan/core"
 	"github.com/ranon-rat/decChan/crypt"
 	"github.com/ranon-rat/decChan/node/src/db"
 )
 
+// deberia de trabajar en el formato para poder hacer esto mas sencillo
+// luego lo agregare
+func GetPosts(w http.ResponseWriter, r *http.Request) {
+	// 127.0.0.1/get-post?date=blah&board=blah
+	// board can be
+	date, err := strconv.Atoi(r.URL.Query().Get("date"))
+	if err != nil {
+		http.Error(w, "non valid date", http.StatusBadRequest)
+		return
+	}
+	board := r.URL.Query().Get("board")
+	if board == "" {
+		http.Error(w, "empty field", http.StatusBadRequest)
+		return
+	}
+	if !core.Boards[board] && !db.CheckExistencePosts(board) {
+		http.Error(w, "non existence of the board or the post", http.StatusBadRequest)
+		return
+	}
+	json.NewEncoder(w).Encode(db.GetPosts(board, date))
+}
 func NewPost(w http.ResponseWriter, r *http.Request) {
 
 	var blockPost core.BlockPost
@@ -17,8 +39,8 @@ func NewPost(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "formato no valido", http.StatusBadRequest)
 		return
 	}
-	// simple crypto cool stuff
-	hash := crypt.GenHashPost(blockPost.Post)
+	post := blockPost.Post
+	hash := crypt.GenHashPost(post)
 	signature, err := hex.DecodeString(blockPost.Signature)
 	if err != nil {
 		return
@@ -28,16 +50,30 @@ func NewPost(w http.ResponseWriter, r *http.Request) {
 		core.PrintInfo("someone sent something weird")
 		return
 	}
+	if !core.Boards[post.SubBoard] && !db.CheckExistencePosts(post.SubBoard) {
+		return
+	}
+	if db.CheckExistencePosts(post.SubBoard) && db.ItGotToLimit(post.SubBoard) {
+		http.Error(w, "i cant accept more post from this thread, avoid it", http.StatusBadRequest)
+
+		return
+	}
+	// tecnicamente no puedo repetir algo aqui asi que no deberia de haber problema, solamente
+	// que alguien puede replicar esto
+	// aun que de todas maneras lo detendria la base de datos
+
+	hashS := hex.EncodeToString(hash)
+	if db.CheckExistenceDeletion(hashS) || db.CheckExistencePosts(hashS) {
+		http.Error(w, "this is just trash, ignore it", http.StatusBadRequest)
+
+		return
+	}
+
+	db.AddPost(blockPost)
 	blocksChan <- BlockSender{
 		Blocks: core.Blocks{
 			BlocksPosts: []core.BlockPost{blockPost},
 		}}
-	hashS := hex.EncodeToString(hash)
-	if db.CheckExistenceDeletion(hashS) || db.CheckExistencePosts(hashS) {
-		return
-	}
-	db.AddPost(blockPost)
-
 }
 func DeletePost(w http.ResponseWriter, r *http.Request) {
 	var blockDel core.BlockDeletion
@@ -52,6 +88,9 @@ func DeletePost(w http.ResponseWriter, r *http.Request) {
 	}
 	if !crypt.VerifySignature(signature, hash, pubKey) {
 		core.PrintInfo("someone sent something weird")
+	}
+	if db.CheckExistenceDeletion(blockDel.HashPost) {
+		return
 	}
 	blocksChan <- BlockSender{
 		Blocks: core.Blocks{

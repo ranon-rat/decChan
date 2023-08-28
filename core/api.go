@@ -1,37 +1,14 @@
 package core
 
-type ProtocolStuff struct {
-	Signature string
-	BlockPost BlockPost
-	DeletePost
-}
-type DeletePost struct {
-	HashPost string
-}
-type BlockDeletion struct {
-	HashPost string
-	DatePost int
-
-	Signature    string
-	DateDeletion int
-}
-type BlockPost struct {
-	Signature string // this will have a signature in it with rsa and a hash of the post
-	Hash      string // optional
-	Post      Post
-}
-type Blocks struct {
-	BlocksPosts    []BlockPost
-	BlocksDeletion []BlockDeletion
-}
+// later i wanna improve this
+// i want to make sure that this can work by connecting the nodes to the near ones
+// but since this is not finish i will try to add that.
+// but for now, a random connection to a node is enough
 type ConnIP struct {
 	IP   string
 	Port int
 }
 
-type Gimme struct {
-	Hash string
-}
 type Post struct {
 	User     string
 	Post     string

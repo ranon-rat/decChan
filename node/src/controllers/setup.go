@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"sync"
 
 	"github.com/ranon-rat/decChan/core"
 	"github.com/ranon-rat/decChan/crypt"
@@ -26,7 +27,7 @@ func ConnectWS(host string) (conn *websocket.Conn, err error) {
 	return
 }
 func setupConns() {
-
+	var wg sync.WaitGroup
 	r, err := http.Get("http://" + core.MainServer + "/gimme5")
 	if err != nil {
 		log.Panic(err)
@@ -40,8 +41,14 @@ func setupConns() {
 		if err != nil {
 			continue
 		}
-		conns[conn] = true
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			Receiver(conn)
+		}()
+
 	}
+	wg.Wait()
 }
 
 func setupKey() {
