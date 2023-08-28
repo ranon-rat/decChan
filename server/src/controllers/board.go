@@ -48,10 +48,9 @@ func PostBoard(w http.ResponseWriter, r *http.Request) {
 	conns := GetRandomConns()
 	// sometimes i hate and love go, in this case i hate it
 
-	hash := crypt.GenHashPost(post)
-	signature := crypt.SignMSG(PrivateKey, hash)
+	signature := crypt.SignMSG(PrivateKey, crypt.GenPostStr(post))
 	sentIt := bytes.NewBuffer(nil)
-	fmt.Println(signature, post, hex.EncodeToString(signature), hex.EncodeToString(hash), hash, hex.EncodeToString(crypt.GenHashPost(post)), hex.EncodeToString(crypt.GenHashPost(post)))
+	fmt.Println(signature, post)
 	json.NewEncoder(sentIt).Encode(core.BlockPost{Signature: hex.EncodeToString(signature), Post: post})
 	manyErrors := 0
 	status := 404

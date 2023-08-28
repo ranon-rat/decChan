@@ -6,6 +6,7 @@ import (
 	"crypto/rsa"
 	"crypto/sha256"
 	"crypto/x509"
+	"encoding/hex"
 	"encoding/pem"
 	"fmt"
 	"log"
@@ -24,6 +25,7 @@ func main() {
 	fmt.Printf("sign %d,hash %d msg %s\n", len(fmt.Sprintf("%x", sign)), len(fmt.Sprintf("%x", hash)), msg)
 
 	fmt.Println(VerifySignature(sign, hash, pubKey))
+	fmt.Println(hex.EncodeToString(sign))
 	fmt.Println(VerifySignature(sign, []byte{}, pubKey))
 }
 

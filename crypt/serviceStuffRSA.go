@@ -4,6 +4,7 @@ import (
 	"crypto"
 	"crypto/rand"
 	"crypto/rsa"
+	"crypto/sha256"
 	"crypto/x509"
 	"encoding/pem"
 	"net/http"
@@ -28,13 +29,15 @@ also, the size of the signature is 512 if we are using hex for coding it, and th
 so i need to keep that in mind while working in the database.
 */
 
-func SignMSG(priKey *rsa.PrivateKey, msgHashSum []byte) []byte {
-
-	// i dont think that there is no need to save the hash, but i will save it in the server
-	signature, err := rsa.SignPSS(rand.Reader, priKey, crypto.SHA256, msgHashSum, nil)
+func SignMSG(priKey *rsa.PrivateKey, msg []byte) (signature []byte) {
+	msgHash := sha256.New()
+	msgHash.Sum((msg))
+	// i dont think that there is
+	hashSum := msgHash.Sum(nil) // no need to save the hash, but i will save it in the server
+	signature, err := rsa.SignPSS(rand.Reader, priKey, crypto.SHA256, hashSum, nil)
 	if err != nil {
 		core.PrintErr(err)
 	}
-	return signature
+	return
 
 }
