@@ -23,7 +23,7 @@ func Init() (privKey *rsa.PrivateKey, pubKey *rsa.PublicKey) {
 func ParseKeys(namefile string) (prvKey *rsa.PrivateKey, pubKey *rsa.PublicKey) {
 	pemFile, err := os.ReadFile(namefile)
 	if err != nil {
-		log.Panic(core.ErrMsg, "it appears that the", namefile, "doesnt exists")
+		log.Print(core.ErrMsg, "it appears that the", namefile, "doesnt exists")
 		return
 	}
 	block, _ := pem.Decode(pemFile)
