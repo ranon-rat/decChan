@@ -21,7 +21,7 @@ func ScanningPost(r *sql.Rows) (postsBlocks []core.BlockPost) {
 				&post.User,
 				&post.Title,
 				&hash,
-				post.SubBoard,
+				post.Board,
 				&signature)
 			postsBlocks = append(postsBlocks, core.BlockPost{
 				Post:      post,

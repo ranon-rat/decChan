@@ -14,7 +14,7 @@ func AddPost(blockPost core.BlockPost) {
 		post.Title,
 		blockPost.Signature,
 		crypt.GenHashPost(post),
-		post.SubBoard,
+		post.Board,
 	)
 }
 func DeletePost(blockDeletion core.BlockDeletion) {

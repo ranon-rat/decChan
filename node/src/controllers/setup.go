@@ -60,7 +60,11 @@ func setupKey() {
 	pubKey = crypt.ParsePubKey(b)
 }
 
-func Setup() {
+func Setup(port string) {
+	_, err := http.Get("http://" + core.MainServer + "/connect&port=" + (port))
+	if err != nil {
+		panic(err)
+	}
 	setupKey()
 	setupConns()
 

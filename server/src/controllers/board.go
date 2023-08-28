@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"bufio"
+	"bytes"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
@@ -40,25 +40,28 @@ func PostBoard(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	post.Date = int(time.Now().Unix())
-	if _, err := hex.DecodeString(post.SubBoard); err != nil && !core.Boards[post.SubBoard] {
+	if _, err := hex.DecodeString(post.Board); err != nil && !core.Boards[post.Board] {
 		http.Error(w, "this isnt a board or a thread this is just bullshit", http.StatusBadRequest)
 		return
 	}
 
 	conns := GetRandomConns()
 	// sometimes i hate and love go, in this case i hate it
-	sentIt := bufio.NewReadWriter(nil, nil)
 
 	hash := crypt.GenHashPost(post)
 	signature := crypt.SignMSG(PrivateKey, hash)
+	sentIt := bytes.NewBuffer(nil)
+
 	json.NewEncoder(sentIt).Encode(core.BlockPost{Signature: hex.EncodeToString(signature), Post: post})
 	manyErrors := 0
 	status := 404
 	reason := ""
 	for _, ipConn := range conns {
+		fmt.Println("sending it to ", ipConn)
 		r, err := http.Post(
 			fmt.Sprintf("http://%s:%d/new-post", ipConn.IP, ipConn.Port), "application/json", sentIt)
 		if err != nil {
+			fmt.Println(err.Error())
 			if strings.Contains(err.Error(), "connection refused") {
 				delete(listConns, ipConn)
 				continue
@@ -72,6 +75,7 @@ func PostBoard(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, reason, status)
 		return
 	}
+	w.Write([]byte("hey thanks"))
 }
 
 // this is only for moderators

@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"math/rand"
 	"net/http"
 	"reflect"
@@ -15,7 +16,7 @@ func GetRandomConns() []core.ConnIP {
 	rand5 := make(map[core.ConnIP]bool) // i want non repeated
 	keys := reflect.ValueOf(listConns).MapKeys()
 
-	for len(rand5) < map[bool]int{true: len(listConns), false: 5}[len(listConns) < 5] {
+	for len(rand5) < 5 && len(rand5) < len(listConns) {
 		val := keys[rand.Intn(len(keys))].Interface().(core.ConnIP)
 
 		rand5[val] = true
@@ -24,6 +25,7 @@ func GetRandomConns() []core.ConnIP {
 	for v := range rand5 {
 		rando = append(rando, v)
 	}
+	fmt.Println(rando)
 	return rando
 }
 func Conns5(w http.ResponseWriter, r *http.Request) {

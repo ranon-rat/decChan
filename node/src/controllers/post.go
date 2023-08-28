@@ -3,6 +3,7 @@ package controllers
 import (
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -50,10 +51,11 @@ func NewPost(w http.ResponseWriter, r *http.Request) {
 		core.PrintInfo("someone sent something weird")
 		return
 	}
-	if !core.Boards[post.SubBoard] && !db.CheckExistencePosts(post.SubBoard) {
+	fmt.Println(post.Board)
+	if !core.Boards[post.Board] && !db.CheckExistencePosts(post.Board) {
 		return
 	}
-	if db.CheckExistencePosts(post.SubBoard) && db.ItGotToLimit(post.SubBoard) {
+	if db.CheckExistencePosts(post.Board) && db.ItGotToLimit(post.Board) {
 		http.Error(w, "i cant accept more post from this thread, avoid it", http.StatusBadRequest)
 
 		return

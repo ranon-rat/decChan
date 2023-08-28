@@ -10,9 +10,9 @@ type ConnIP struct {
 }
 
 type Post struct {
-	User     string
-	Post     string
-	Date     int
-	Title    string
-	SubBoard string // this could be a board or a post if the post is used as a response to something
+	User  string
+	Post  string
+	Date  int
+	Title string
+	Board string // this could be a board or a post if the post is used as a response to something
 }

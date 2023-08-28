@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 	"os/exec"
 	"strconv"
@@ -27,6 +28,7 @@ func Connect(w http.ResponseWriter, r *http.Request) {
 	conn := core.ConnIP{IP: ip, Port: port}
 
 	listConns[conn] = true
+	fmt.Println(listConns)
 
 	for {
 		// I will change this later

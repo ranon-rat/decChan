@@ -7,7 +7,7 @@ import (
 )
 
 func Setup(port string) {
-	go controllers.Setup()
+	go controllers.Setup(port)
 	go controllers.Sender()
 
 	http.HandleFunc("/ws", controllers.Connection)
