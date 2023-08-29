@@ -8,30 +8,30 @@ import (
 )
 
 func ScanningPost(r *sql.Rows) (postsBlocks []core.BlockPost) {
+	var wg sync.WaitGroup
+
 	for r.Next() {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			var block core.BlockPost
 
-		var post core.Post
-		var signature string
-		var hash string
-		r.Scan(&post.Date,
-			&post.Post,
-			&post.User,
-			&post.Title,
-			&hash,
-			&post.Board,
-			&signature)
-		postsBlocks = append(postsBlocks, core.BlockPost{
-			Post:      post,
-			Hash:      hash,
-			Signature: signature,
-		})
-
+			r.Scan(&block.Post.Date,
+				&block.Post.Post,
+				&block.Post.User,
+				&block.Post.Title,
+				&block.Hash,
+				&block.Post.Board,
+				&block.Signature)
+			postsBlocks = append(postsBlocks, block)
+		}()
 	}
+	wg.Wait()
 	return
 }
 func ScanningDeletes(r *sql.Rows) (delBlocks []core.BlockDeletion) {
-	var wg sync.WaitGroup
 
+	var wg sync.WaitGroup
 	for r.Next() {
 		wg.Add(1)
 		go func() {

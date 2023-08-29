@@ -9,22 +9,14 @@ func GetPosts(name string, date int) (blocks []core.BlockPost) {
 	defer db.Close()
 
 	if core.Boards[name] {
-		r, err := db.Query("SELECT * FROM Posts WHERE board=?1 and date<?2  ORDER BY date ASC LIMIT ?3", name, date, core.LimitPerBoard)
-		if err != nil {
-			core.PrintErr(err)
-			return
-		}
+		r, _ := db.Query("SELECT * FROM Posts WHERE board=?1 and date<?2  ORDER BY date ASC LIMIT ?3", name, date, core.LimitPerBoard)
 
 		blocks = ScanningPost(r)
 
 	} else {
 		// I use the board as a way of saying "hey this could be a board or a thread and if is a thread just get all this stuff and just that"
-		r, err := db.Query("SELECT * FROM Posts WHERE board=?1 OR hash=?1 ORDER BY date DESC ", name)
-		if err != nil {
-			core.PrintErr(err)
+		r, _ := db.Query("SELECT * FROM Posts WHERE board=?1 OR hash=?1 ORDER BY date DESC ", name)
 
-			return
-		}
 		blocks = ScanningPost(r)
 
 	}

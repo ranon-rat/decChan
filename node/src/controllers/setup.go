@@ -28,9 +28,11 @@ func ConnectWS(host string) (conn *websocket.Conn, err error) {
 	return
 }
 func setupConns() {
+	core.PrintTodo("connecting")
 	var wg sync.WaitGroup
 	r, err := http.Get("http://" + core.MainServer + "/gimme5")
 	if err != nil {
+
 		log.Panic(err)
 	}
 	var connsIPs []core.ConnIP

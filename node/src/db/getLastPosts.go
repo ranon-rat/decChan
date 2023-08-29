@@ -4,7 +4,6 @@ package db
 REMINDER TO END THIS AT HOME
 */
 func GetLastPostDate() (date int) {
-
 	db := ConnectDB()
 	defer db.Close()
 	db.QueryRow(`SELECT date FROM POSTS ORDER BY date DESC`).Scan(&date)

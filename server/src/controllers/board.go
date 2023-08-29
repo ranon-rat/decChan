@@ -33,30 +33,34 @@ func Board(w http.ResponseWriter, r *http.Request) {
 // even the ones that doesnt use javascript
 
 func PostBoard(w http.ResponseWriter, r *http.Request) {
+	// decode
 	var post core.Post
-
 	if json.NewDecoder(r.Body).Decode(&post) != nil {
 		http.Error(w, "the fuck is this", http.StatusBadRequest)
 		return
 	}
 	post.Date = int(time.Now().Unix())
+	// check if the board is valid
 	if _, err := hex.DecodeString(post.Board); err != nil && !core.Boards[post.Board] {
-		http.Error(w, "this isnt a board or a thread this is just bullshit", http.StatusBadRequest)
+		core.PrintErr("someone sent a non valid board")
+		http.Error(w, "this isnt a board or a thread", http.StatusBadRequest)
 		return
 	}
 
 	conns := GetRandomConns()
-	// sometimes i hate and love go, in this case i hate it
 
-	signature := crypt.SignMSG(PrivateKey, crypt.GenHashPost(post))
-	sentIt := bytes.NewBuffer(nil)
-	json.NewEncoder(sentIt).Encode(core.BlockPost{Signature: hex.EncodeToString(signature), Post: post})
-	manyErrors := 0
-	status := 404
-	reason := ""
+	blockData, _ := json.Marshal(core.BlockPost{
+		Signature: crypt.SignMSG(PrivateKey, crypt.GenHashPost(post)),
+		Post:      post})
+	// errors
+	manyErrors, status, reason := 0, 404, ""
+
 	for _, ipConn := range conns {
 		r, err := http.Post(
-			fmt.Sprintf("http://%s:%d/new-post", ipConn.IP, ipConn.Port), "application/json", sentIt)
+			fmt.Sprintf("http://%s:%d/new-post",
+				ipConn.IP,
+				ipConn.Port),
+			"application/json", bytes.NewBuffer(blockData))
 		if err != nil {
 			core.PrintErr(err.Error())
 
@@ -64,8 +68,8 @@ func PostBoard(w http.ResponseWriter, r *http.Request) {
 				delete(listConns, ipConn)
 				continue
 			}
-			status = r.StatusCode
-			reason = err.Error()
+			status, reason = r.StatusCode, err.Error()
+
 			manyErrors++
 		}
 	}
@@ -73,7 +77,7 @@ func PostBoard(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, reason, status)
 		return
 	}
-	w.Write([]byte("hey thanks"))
+	w.Write([]byte("hey thanks\n"))
 }
 
 // this is only for moderators

@@ -6,16 +6,30 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/ranon-rat/decChan/core"
 	"github.com/ranon-rat/decChan/node/src/router"
 )
 
-var port = 8000 + rand.Intn(100)
+var port = 8921
 
 func main() {
 	rand.Seed(time.Now().Unix())
-	port = 8000 + rand.Intn(100)
-	fmt.Println("this isnt ready i need to finish the server, wait a few days for ending this")
-	fmt.Println("\n\nI recomend you to check http://localhost:" + strconv.Itoa(port))
+	if core.Dev {
+		port = 8000 + rand.Intn(100)
+	}
+	fmt.Println(`
+	                                    
+	____             _____ _           
+	|    \ ___ ___   |     | |_ ___ ___ 
+	|  |  | -_|  _|  |   --|   | .'|   |
+	|____/|___|___|  |_____|_|_|__,|_|_|
+										
+	
+	A project made with love by @bruh-boys
+	
+	Welcome to thisw 
+	`)
+	fmt.Println("\n\nI recomend you to go check http://localhost:" + strconv.Itoa(port))
 	router.Setup(strconv.Itoa(port))
 
 }

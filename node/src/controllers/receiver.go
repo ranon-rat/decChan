@@ -31,7 +31,7 @@ func Receiver(c *websocket.Conn) {
 			hashPost := hex.EncodeToString(hashBlock)
 			signature := hexToB(blockPost.Signature)
 			if !crypt.VerifySignature(signature, hashBlock, pubKey) {
-				core.PrintInfo("someone sent a non valid block")
+				core.PrintErr("someone sent a non valid block")
 				delete(conns, c)
 
 			}
@@ -48,7 +48,7 @@ func Receiver(c *websocket.Conn) {
 			hashPost := blockDeletion.HashPost
 			signature := hexToB(blockDeletion.Signature)
 			if !crypt.VerifySignature(signature, hashBlock, pubKey) {
-				core.PrintInfo("someone sent a non valid block")
+				core.PrintErr("someone sent a non valid block")
 				delete(conns, c)
 
 			}

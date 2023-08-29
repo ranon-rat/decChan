@@ -11,6 +11,7 @@ const (
 	InfoMsg        = "[?]"
 	TodoMsg        = "[+]"
 	LimitPerBoard  = 50
+	Dev            = true
 	LimitPerThread = 500
 )
 
@@ -33,5 +34,7 @@ func PrintInfo(msg ...any) {
 }
 
 func PrintTodo(msg ...any) {
-	log.Println(TodoMsg, msg)
+	if Dev {
+		log.Println(TodoMsg, msg)
+	}
 }
