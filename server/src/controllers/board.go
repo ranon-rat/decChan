@@ -50,17 +50,16 @@ func PostBoard(w http.ResponseWriter, r *http.Request) {
 
 	signature := crypt.SignMSG(PrivateKey, crypt.GenHashPost(post))
 	sentIt := bytes.NewBuffer(nil)
-	fmt.Println(signature, post)
 	json.NewEncoder(sentIt).Encode(core.BlockPost{Signature: hex.EncodeToString(signature), Post: post})
 	manyErrors := 0
 	status := 404
 	reason := ""
 	for _, ipConn := range conns {
-		fmt.Println("sending it to ", ipConn)
 		r, err := http.Post(
 			fmt.Sprintf("http://%s:%d/new-post", ipConn.IP, ipConn.Port), "application/json", sentIt)
 		if err != nil {
-			fmt.Println(err.Error())
+			core.PrintErr(err.Error())
+
 			if strings.Contains(err.Error(), "connection refused") {
 				delete(listConns, ipConn)
 				continue

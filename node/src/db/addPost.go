@@ -1,6 +1,8 @@
 package db
 
 import (
+	"encoding/hex"
+
 	"github.com/ranon-rat/decChan/core"
 	"github.com/ranon-rat/decChan/crypt"
 )
@@ -8,13 +10,21 @@ import (
 func AddPost(blockPost core.BlockPost) {
 	db := ConnectDB()
 	post := blockPost.Post
-	db.Exec("INSERT INTO POSTS(date,body,username,signature,hash,subBoard) VALUES(?1,?2,?3,?4,?5,?6,?7)", post.Date,
+	db.Exec(`INSERT INTO POSTS(
+		date,
+		body,
+		username,
+		title,
+		hash,
+		board,
+		signature) VALUES(?1,?2,?3,?4,?5,?6,?7)`,
+		post.Date,
 		post.Post,
 		post.User,
 		post.Title,
-		blockPost.Signature,
-		crypt.GenHashPost(post),
+		hex.EncodeToString(crypt.GenHashPost(post)),
 		post.Board,
+		blockPost.Signature,
 	)
 }
 func DeletePost(blockDeletion core.BlockDeletion) {

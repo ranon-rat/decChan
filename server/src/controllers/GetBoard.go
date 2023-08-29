@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/ranon-rat/decChan/core"
 	"github.com/ranon-rat/decChan/crypt"
@@ -20,6 +21,9 @@ func GetBoard(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, "non valid date", http.StatusBadRequest)
 		return
+	}
+	if date == 0 {
+		date = int(time.Now().Unix())
 	}
 	board := r.URL.Query().Get("board")
 	if board == "" {

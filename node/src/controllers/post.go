@@ -3,7 +3,6 @@ package controllers
 import (
 	"encoding/hex"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -31,7 +30,9 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "non existence of the board or the post", http.StatusBadRequest)
 		return
 	}
-	json.NewEncoder(w).Encode(db.GetPosts(board, date))
+	blocks := db.GetPosts(board, date)
+	core.PrintInfo(blocks)
+	json.NewEncoder(w).Encode(blocks)
 }
 func NewPost(w http.ResponseWriter, r *http.Request) {
 
@@ -45,21 +46,23 @@ func NewPost(w http.ResponseWriter, r *http.Request) {
 	signature, err := hex.DecodeString(blockPost.Signature)
 
 	if err != nil {
-		fmt.Println(err)
+		core.PrintErr(err)
 		return
 	}
-	fmt.Println(blockPost)
+	core.PrintInfo(blockPost)
 	// verify everything
 	if !crypt.VerifySignature(signature, hash, pubKey) {
 		core.PrintInfo("someone sent something weird")
 		http.Error(w, "non valid block", 404)
 		return
 	}
-	fmt.Println(post.Board)
+
 	if !core.Boards[post.Board] && !db.CheckExistencePosts(post.Board) {
+		core.PrintInfo("someone sent a non valid board delete it or be gay")
 		return
 	}
 	if db.CheckExistencePosts(post.Board) && db.ItGotToLimit(post.Board) {
+		core.PrintErr("this got to the limit")
 		http.Error(w, "i cant accept more post from this thread, avoid it", http.StatusBadRequest)
 
 		return
@@ -70,6 +73,8 @@ func NewPost(w http.ResponseWriter, r *http.Request) {
 
 	hashS := hex.EncodeToString(hash)
 	if db.CheckExistenceDeletion(hashS) || db.CheckExistencePosts(hashS) {
+		core.PrintErr("this block is repeated")
+
 		http.Error(w, "this is just trash, ignore it", http.StatusBadRequest)
 
 		return
