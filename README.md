@@ -1,7 +1,10 @@
 # decChan
 
-Hello this is a really simple project that i made just to learn more about decentralize networks.
-Its really simple and it only sent info to the networks, maybe later i will be working a few stuff just for making it better.
+This is a really simple project that you can use for creating you own chan, is no that complex to implement.
 
-For now i havent test this yet so if you want to test its not going to work.
-So for  now this is just for sharing it with friends.
+For now its still in develop, but you can try it if you want, but the interface hasnt been implemented yet, so you can test it but the only thing that you will see is an array with objects.
+
+I need to work more in the way the server check the connections but for now is not a big deal.
+
+I love you guys, thanks for visiting this project.
+Im open for improvements and critics.
