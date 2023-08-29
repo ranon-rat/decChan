@@ -30,9 +30,9 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "non existence of the board or the post", http.StatusBadRequest)
 		return
 	}
-	blocks := db.GetPosts(board, date)
-	core.PrintInfo(blocks)
-	json.NewEncoder(w).Encode(blocks)
+	//blocks := db.GetPosts(board, date)
+	//core.PrintInfo(blocks)
+	json.NewEncoder(w).Encode(db.GetPosts(board, date))
 }
 func NewPost(w http.ResponseWriter, r *http.Request) {
 
@@ -49,7 +49,6 @@ func NewPost(w http.ResponseWriter, r *http.Request) {
 		core.PrintErr(err)
 		return
 	}
-	core.PrintInfo(blockPost)
 	// verify everything
 	if !crypt.VerifySignature(signature, hash, pubKey) {
 		core.PrintInfo("someone sent something weird")

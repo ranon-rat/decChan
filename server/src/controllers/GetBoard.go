@@ -55,6 +55,7 @@ func GetBoard(w http.ResponseWriter, r *http.Request) {
 
 		if !CheckValid(blocks) {
 			delete(listConns, ipConn)
+			core.PrintInfo(blocks)
 			continue
 		}
 
