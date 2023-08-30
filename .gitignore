@@ -1,2 +1,2 @@
-
+server/*.pem
 node/db/database.db
